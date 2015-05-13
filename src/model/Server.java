@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import java.io.BufferedReader;
@@ -23,9 +18,7 @@ import model.ircevent.NickEvent;
 import model.ircevent.PingEvent;
 import model.ircevent.PongEvent;
 import model.ircevent.PrivmsgEvent;
-import model.ircevent.RAWEvent;
 import model.ircevent.UserEvent;
-import controller.Controller;
 
 /**
  *
@@ -48,10 +41,23 @@ public class Server {
 	private boolean registred;
 
 	
+	/**
+	 * @param nick nick to set on server
+	 * @param host host name 
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public Server(String nick, String host) throws UnknownHostException, IOException {
 		this(nick,host,6667);
 	}
 	
+	/**
+	 * @param nick nick to set on server
+	 * @param host host name 
+	 * @param port port of host
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public Server(String nick, String host, int port) throws UnknownHostException, IOException {
 		super();
 		this.nick = nick;
@@ -79,6 +85,9 @@ public class Server {
 		this.current_channel = this.root_channel;
 	}
 	
+	/**
+	 * connect to server
+	 */
 	public void connect() {
 
 		this.in_thread.start();
@@ -135,14 +144,26 @@ public class Server {
 	}
 	
 	
+	/**
+	 * Check if user is registered on server
+	 * @return true if user is registered
+	 */
 	public synchronized boolean isRegistred() {
 		return this.registred;
 	}
 
+	/**
+	 * Set if user is registered
+	 * @param registred new boolean registered value
+	 */
 	public synchronized void setRegistred(boolean registred) {
 		this.registred = registred;
 	}
 	
+	/**
+	 * Send event to server
+	 * @param m Event to send
+	 */
 	public void sendEvent(IRCEvent m) {
 
 		if (!this.isRegistred() && (m instanceof NickEvent
@@ -154,10 +175,17 @@ public class Server {
 		}
 	}
 	
+	/**
+	 * @return server's current channel selected for communication
+	 */
 	public synchronized Channel getCurrentChannel() {
 		return current_channel;
 	}
 
+	/**
+	 * Set channel to be current
+	 * @param name name of channel to set
+	 */
 	public synchronized void setCurrentChannel(String name) {
 		if (name == null) {
 			this.current_channel = this.root_channel;
@@ -174,6 +202,11 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Get channel by name
+	 * @param name name of channel
+	 * @return Channel of given name
+	 */
 	public synchronized Channel getChannel(String name) {
 		if (name == null) {
 			return this.root_channel;
@@ -189,15 +222,26 @@ public class Server {
 		return this.root_channel;
 	}
 	
+	/**
+	 * @return server's host name
+	 */
 	public synchronized String getHost() {
 		return host;
 	}
 	
+	/**
+	 * Create new channel
+	 * @param name name of new channel
+	 */
 	public void addChannel(String name)
 	{
 		this.channels.add(new Channel(name));
 	}
 	
+	/**
+	 * Remove channel from server by name
+	 * @param name name of channel to remove
+	 */
 	public void removeChannel(String name)
 	{
 		if (name == null) {
@@ -213,6 +257,9 @@ public class Server {
 			}
 		}
 	}
+	/**
+	 * @return nick of user on server
+	 */
 	public synchronized String getNick() {
 		return nick;
 	}

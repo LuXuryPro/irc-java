@@ -5,10 +5,6 @@
  */
 package model.ircevent;
 
-/**
- *
- * @author radek
- */
 public class UserEvent extends IRCEvent{
     private final String login;
     public UserEvent(String login) {

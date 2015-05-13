@@ -9,8 +9,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Panel;
-import java.util.concurrent.BrokenBarrierException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,10 +19,7 @@ import javax.swing.JTextField;
 
 import controller.Controller;
 
-/**
- *
- * @author radek
- */
+
 public class View {
 	private final JFrame frame;
 	private final ConnectionList connectionList;
@@ -33,22 +28,37 @@ public class View {
 	private final JTextField entry;
 	private final JLabel topic;
 
+	/**
+	 * @return ConnectionList object of view
+	 */
 	public ConnectionList getConnectionList() {
 		return connectionList;
 	}
 
+	/**
+	 * @return UsersList object
+	 */
 	public UsersList getUsersList() {
 		return usersList;
 	}
 
+	/**
+	 * @return main text field object
+	 */
 	public JTextField getEntry() {
 		return entry;
 	}
 
+	/**
+	 * @return main text object
+	 */
 	public JTextArea getText() {
 		return text;
 	}
 
+	/**
+	 * @return text scroll object
+	 */
 	public JScrollPane getText_scroll() {
 		return text_scroll;
 	}
@@ -99,20 +109,35 @@ public class View {
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Set action listener of View
+	 * @param c Controller to delegate as listener
+	 */
 	public void setListener(Controller c) {
 		this.entry.addActionListener(c);
 		this.connectionList.setListener(c);
 	}
 
 
+	/**
+	 * Set main text area to display given text
+	 * @param text text to display
+	 */
 	public void setText(String text) {
 		this.text.setText(text);
 		this.text.setCaretPosition(this.text.getDocument().getLength());
 	}
 	
+	/**
+	 * Set topic label to given text
+	 * @param text text to set in topic label
+	 */
 	public void setTopic(String text) {
 		this.topic.setText(text);
 	}
+	/**
+	 * Clear main view area 
+	 */
 	public void clearText() {
 		this.text.setText("");
 	}

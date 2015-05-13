@@ -5,36 +5,58 @@
  */
 package model;
 
-/**
- *
- * @author radek
- */
 public class User {
 	private String name;
+	/**
+	 * User ranks on channel
+	 */
 	public enum UserMode {NORMAL,VOICE,OP};
 	private UserMode mode;
 
+	/**
+	 * @return user nickname
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Set user name
+	 * @param name name to set
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return user mode
+	 */
 	public UserMode getMode() {
 		return mode;
 	}
 
+	/**
+	 * Set user mode
+	 * @param mode mode to set
+	 */
 	public void setMode(UserMode mode) {
 		this.mode = mode;
 	}
 
+	/**
+	 * Create new user
+	 * @param name nick of user
+	 * @param mode user rank in channel
+	 */
 	public User(String name, UserMode mode) {
 		this.name = name;
 		this.mode = mode;
 	}
 	
+	/**
+	 * Create new user
+	 * @param raw_string - raw sting from server
+	 */
 	public User(String raw_string) {
 		if (raw_string.startsWith("@"))
 		{
@@ -53,6 +75,9 @@ public class User {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString()
 	{

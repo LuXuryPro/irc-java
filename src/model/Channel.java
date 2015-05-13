@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import java.util.ArrayList;
@@ -15,16 +10,16 @@ import model.ircevent.PartEvent;
 import model.ircevent.TopicChangeEvent;
 import model.ircevent.TopicEvent;
 
-/**
- *
- * @author radek
- */
 public class Channel {
 	private String name;
 	private String topic;
 	private ArrayList<User> users;
 	private ArrayList<IRCEvent> events;
 
+	/**
+	 * Create new channel
+	 * @param name channel name
+	 */
 	public Channel(String name) {
 		this.name = name;
 		this.topic = new String("");
@@ -32,18 +27,21 @@ public class Channel {
 		this.events = new ArrayList<IRCEvent>();
 	}
 
+	/**
+	 * Add new event to channel
+	 * @param e Event to add
+	 */
 	public synchronized void addEvent(IRCEvent e) {
 		this.events.add(e);
 		if (e instanceof NamesEvent) {
-			this.users.clear();
 			for (User s : ((NamesEvent) e).getNicks()) {
+				if (this.getUserByName(s.getName()) == null)
 					this.users.add(s);
 			}
 		}
 		else if (e instanceof JoinEvent) {
 			if (this.getUserByName(((JoinEvent) e).getUser()) == null)
-				this.users.add(new User(((JoinEvent) e).getUser(),
-						UserMode.NORMAL));
+				this.users.add(new User(((JoinEvent) e).getUser(),UserMode.NORMAL));
 			}
 		else if (e instanceof PartEvent) {
 			if (this.getUserByName(((PartEvent) e).getUser()) != null)
@@ -58,6 +56,11 @@ public class Channel {
 		this.notifyAll();
 	}
 
+	/**
+	 * Find user on channel
+	 * @param name name of user
+	 * @return User object on channel
+	 */
 	public User getUserByName(String name) {
 		for (User u : users) {
 			if (u.getName().equals(name))
@@ -67,6 +70,10 @@ public class Channel {
 	}
 
 	
+	/**
+	 * Remove user from channel
+	 * @param name name of user to remove
+	 */
 	public void removeUser(String name)
 	{
 		int i = 0;
@@ -80,15 +87,26 @@ public class Channel {
 			i++;
 		}
 	}
+	/**
+	 * @return name of channel
+	 */
 	public synchronized String getName() {
 		return name;
 	}
 
+	/**
+	 * @return list of events on channel
+	 */
 	public synchronized ArrayList<IRCEvent> getEvents() {
 		ArrayList<IRCEvent> e = (ArrayList<IRCEvent>) this.events.clone();
 		return e;
 	}
 
+	/**
+	 * Wait on channel's mutex for new events 
+	 * @return copy of all events in channel including new events
+	 * @throws InterruptedException
+	 */
 	public synchronized ArrayList<IRCEvent> waitForEvents()
 			throws InterruptedException {
 		wait();
@@ -96,16 +114,26 @@ public class Channel {
 		return e;
 	}
 
+	/**
+	 * @return list of users on channel
+	 */
 	public synchronized ArrayList<User> getUsers() {
 		return users;
 	}
 
 	/**
-	 * @return the topic
+	 * @return topic of channel
 	 */
 	public synchronized String getTopic() {
 		return topic;
 	}
+	
+	/**
+	 * Save all events on channel to file
+	 * @param file_name name of output file
+	 */
+	public void saveToFile(String file_name)
+	{}
 	
 	
 

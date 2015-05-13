@@ -5,10 +5,6 @@
  */
 package model.ircevent;
 
-/**
- *
- * @author radek
- */
 public class PongEvent extends IRCEvent{
     private final String id;
     public PongEvent(String id) {

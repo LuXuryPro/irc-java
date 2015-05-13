@@ -21,9 +21,12 @@ import model.ircevent.TopicChangeEvent;
 
 /**
  * Controller class of MVC
- *
  */
 public class Controller implements TreeSelectionListener, ActionListener {
+	/**
+	 * Start point of application
+	 * @param args arguments from os
+	 */
 	public static void main(String[] args) {
 		new Controller(new View(), new Model("ArP"));
 	}
@@ -33,10 +36,8 @@ public class Controller implements TreeSelectionListener, ActionListener {
 	private final Thread main_thread;
 
 	/**
-	 * @param v
-	 *            - View to use
-	 * @param m
-	 *            - Model to use
+	 * @param v View to control
+	 * @param m Model to use
 	 */
 	public Controller(View v, Model m) {
 		this.view = v;

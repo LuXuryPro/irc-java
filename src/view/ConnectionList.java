@@ -20,10 +20,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import controller.Controller;
 
-/**
- *
- * @author radek
- */
 public class ConnectionList extends JPanel {
 
 	private final JTree tree;
@@ -50,11 +46,19 @@ public class ConnectionList extends JPanel {
 		sp.add(tree);
 	}
 
+	/**
+	 * Clear all servers and channels
+	 */
 	public void clear() {
 		rootNode.removeAllChildren();
 		treeModel.reload();
 	}
 
+	/**
+	 * Add new server
+	 * @param name name of server
+	 * @return New node of server
+	 */
 	public DefaultMutableTreeNode addServer(String name) {
 		DefaultMutableTreeNode server;
 		if ((server = this.getServer(name)) != null) {
@@ -70,6 +74,11 @@ public class ConnectionList extends JPanel {
 		return server;
 	}
 
+	/**
+	 * Remove server
+	 * @param name name of server
+	 * @return always null
+	 */
 	public DefaultMutableTreeNode removeServer(String name) {
 		DefaultMutableTreeNode server;
 		if ((server = this.getServer(name)) == null) {
@@ -83,6 +92,10 @@ public class ConnectionList extends JPanel {
 		return server;
 	}
 
+	/**
+	 * @param name
+	 * @return Node of server that matches name
+	 */
 	public DefaultMutableTreeNode getServer(String name) {
 		Enumeration<DefaultMutableTreeNode> e = this.rootNode
 				.depthFirstEnumeration();
@@ -95,11 +108,21 @@ public class ConnectionList extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Set selection to given server
+	 * @param name
+	 */
 	public void selectServer(String name) {
 		DefaultMutableTreeNode s = this.getServer(name);
 		this.tree.setSelectionPath(new TreePath(s.getPath()));
 	}
 
+	/**
+	 * Add new channel to view
+	 * @param server_name name of server 
+	 * @param channel_name name of channel
+	 * @return Node of new channel
+	 */
 	public DefaultMutableTreeNode addChannel(String server_name,
 			String channel_name) {
 		DefaultMutableTreeNode s = this.getServer(server_name);
@@ -113,6 +136,11 @@ public class ConnectionList extends JPanel {
 		return c;
 	}
 
+	/**
+	 * @param server_name name of server 
+ 	 * @param channel_name name of channel
+	 * @return Node of channel that matches channel_name
+	 */
 	public DefaultMutableTreeNode getChannel(String server_name,
 			String channel_name) {
 		DefaultMutableTreeNode s = this.getServer(server_name);
@@ -130,6 +158,12 @@ public class ConnectionList extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Remove channel form view
+	 * @param server_name name of server 
+	 * @param channel_name name of channel
+	 * @return always null
+	 */
 	public DefaultMutableTreeNode removeChannel(String server_name,
 			String channel_name) {
 		DefaultMutableTreeNode c = this.getChannel(server_name, channel_name);
@@ -141,11 +175,20 @@ public class ConnectionList extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Set selection to given channel
+	 * @param server_name name of server
+	 * @param channel_name name of channel
+	 */
 	public void selectChannel(String server_name, String channel_name) {
 		DefaultMutableTreeNode c = this.getChannel(server_name, channel_name);
 		this.tree.setSelectionPath(new TreePath(c.getPath()));
 	}
 
+	/**
+	 * Connect itself to listener
+	 * @param c Controller object to be listener
+	 */
 	public void setListener(Controller c) {
 		this.tree.addTreeSelectionListener(c);
 	}

@@ -13,27 +13,6 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 public class UsersList extends ScrollPane {
-
-	public static void main(String[] args) {
-
-		JFrame f = new JFrame("asd");
-		f.setPreferredSize(new Dimension(800,600));
-		UsersList u = new UsersList();
-		f.add(u);
-		f.setVisible(true);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		u.addUser("@Radek");
-		u.addUser("+asd");
-		u.addUser("+Lasd");
-		u.addUser("zasd");
-		try {
-			Thread.sleep(5 * 1000);
-		} catch (InterruptedException ex) {
-			Logger.getLogger(ConnectionList.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		u.removeUser("asd");
-		u.updateUser("+Lasd", "@Lasd");
-	}
 	private final JList<String> list;
 	private final DefaultListModel<String> list_model;
 
@@ -87,16 +66,29 @@ public class UsersList extends ScrollPane {
 		}
 	}
 
+	/**
+	 * Add user to list view
+	 * @param user
+	 */
 	public void addUser(String user) {
 		this.list_model.addElement(user);
 		this.sort();
 	}
 
+	/**
+	 * Replace user with new one
+	 * @param old_user
+	 * @param new_user
+	 */
 	public void updateUser(String old_user, String new_user) {
 		this.removeUser(old_user);
 		this.addUser(new_user);
 	}
 
+	/**
+	 * Remove user form view by name 
+	 * @param user
+	 */
 	public void removeUser(String user) {
 		String u;
 		if (user.startsWith("@") || user.startsWith("+")) {
@@ -114,6 +106,9 @@ public class UsersList extends ScrollPane {
 			}
 		}
 	}
+	/**
+	 * Remove all users form view
+	 */
 	public void clear()
 	{
 		this.list_model.clear();

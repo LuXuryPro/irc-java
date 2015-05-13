@@ -5,10 +5,6 @@
  */
 package model.ircevent;
 
-/**
- *
- * @author radek
- */
 public class PartEvent extends IRCEvent{
     private final String message;
     private final String user;

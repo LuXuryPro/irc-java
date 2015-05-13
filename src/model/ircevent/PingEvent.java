@@ -1,16 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.ircevent;
 
-import java.util.Calendar;
-
-/**
- *
- * @author radek
- */
 public class PingEvent extends IRCEvent{
    private final String id;
     public PingEvent(String id) {
@@ -29,7 +18,6 @@ public class PingEvent extends IRCEvent{
 
 	@Override
 	public String generateDisplayString() {
-		// TODO Auto-generated method stub
 		return null;
 	}
     

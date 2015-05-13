@@ -5,10 +5,6 @@
  */
 package model.ircevent;
 
-/**
- *
- * @author radek
- */
 public class NickEvent extends IRCEvent{
     private final String nick;
 
