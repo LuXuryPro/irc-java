@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package model;
 
 import java.util.ArrayList;
 
-import Model.User.UserMode;
-import Model.IRCEvent.IRCEvent;
-import Model.IRCEvent.JoinEvent;
-import Model.IRCEvent.NamesEvent;
-import Model.IRCEvent.PartEvent;
-import Model.IRCEvent.TopicChangeEvent;
-import Model.IRCEvent.TopicEvent;
+import model.User.UserMode;
+import model.ircevent.IRCEvent;
+import model.ircevent.JoinEvent;
+import model.ircevent.NamesEvent;
+import model.ircevent.PartEvent;
+import model.ircevent.TopicChangeEvent;
+import model.ircevent.TopicEvent;
 
 /**
  *

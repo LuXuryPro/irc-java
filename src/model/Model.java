@@ -1,9 +1,10 @@
-package Model;
+package model;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import Model.IRCEvent.IRCEvent;
+
+import model.ircevent.IRCEvent;
 
 public class Model {
 	private ArrayList<Server> servers;
@@ -70,6 +71,7 @@ public class Model {
 	}
 	
 	public void sendEvent(IRCEvent e){
-		this.current_server.sendEvent(e);
+		if (this.current_server != null)
+			this.current_server.sendEvent(e);
 	}
 }

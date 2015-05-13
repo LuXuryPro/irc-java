@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package model;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,20 +13,19 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import Controler.Controller;
-import Model.IRCEvent.IRCEvent;
-import Model.IRCEvent.JoinEvent;
-import Model.IRCEvent.NickEvent;
-import Model.IRCEvent.PingEvent;
-import Model.IRCEvent.PongEvent;
-import Model.IRCEvent.PrivmsgEvent;
-import Model.IRCEvent.RAWEvent;
-import Model.IRCEvent.UserEvent;
+import model.ircevent.IRCEvent;
+import model.ircevent.JoinEvent;
+import model.ircevent.NickEvent;
+import model.ircevent.PingEvent;
+import model.ircevent.PongEvent;
+import model.ircevent.PrivmsgEvent;
+import model.ircevent.RAWEvent;
+import model.ircevent.UserEvent;
+import controller.Controller;
 
 /**
  *

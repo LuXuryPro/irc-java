@@ -1,8 +1,8 @@
-package Model;
+package model;
 
 import java.util.Collection;
 
-import Model.IRCEvent.*;
+import model.ircevent.*;
 
 public class Parser {
 	public static IRCEvent parse(String raw)

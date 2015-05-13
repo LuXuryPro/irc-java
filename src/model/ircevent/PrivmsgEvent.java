@@ -1,4 +1,4 @@
-package Model.IRCEvent;
+package model.ircevent;
 
 import java.util.Calendar;
 

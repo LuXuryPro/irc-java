@@ -3,23 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.IRCEvent;
+package model.ircevent;
 
 /**
  *
  * @author radek
  */
-public class NickEvent extends IRCEvent{
-    private final String nick;
-
-    public NickEvent(String nick) {
-        super("NICK");
-        this.nick = nick;
+public class UserEvent extends IRCEvent{
+    private final String login;
+    public UserEvent(String login) {
+        super("USER");
+        this.login = login;
     }
     
     @Override
     public String generateRawString() {
-        return this.raw_string + " " + this.nick ;
+        return this.raw_string + " " + this.login + " 8 * :Java IRC Hacks Bot";
     }
 
 	@Override

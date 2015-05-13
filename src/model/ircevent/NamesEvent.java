@@ -1,8 +1,8 @@
-package Model.IRCEvent;
+package model.ircevent;
 
 import java.util.ArrayList;
 
-import Model.User;
+import model.User;
 
 public class NamesEvent extends IRCEvent {
 	private ArrayList<User> nicks;

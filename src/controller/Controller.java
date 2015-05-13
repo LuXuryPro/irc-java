@@ -1,14 +1,4 @@
-package Controler;
-
-import Model.IRCEvent.IRCEvent;
-import Model.IRCEvent.JoinEvent;
-import Model.IRCEvent.NickEvent;
-import Model.IRCEvent.PartEvent;
-import Model.IRCEvent.PrivmsgEvent;
-import Model.IRCEvent.TopicChangeEvent;
-import Model.Model;
-import Model.User;
-import View.View;
+package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +8,16 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+
+import view.View;
+import model.Model;
+import model.User;
+import model.ircevent.IRCEvent;
+import model.ircevent.JoinEvent;
+import model.ircevent.NickEvent;
+import model.ircevent.PartEvent;
+import model.ircevent.PrivmsgEvent;
+import model.ircevent.TopicChangeEvent;
 
 /**
  * Controller class of MVC
@@ -145,14 +145,15 @@ public class Controller implements TreeSelectionListener, ActionListener {
 				} else if (command.startsWith("/nick")) {
 					String[] nick = command.split(" ");
 					String n_nick = nick[1];
-						model.sendEvent(new NickEvent(n_nick));
+					model.sendEvent(new NickEvent(n_nick));
 				} else if (command.startsWith("/join")) {
 					String[] nick = command.split(" ");
 					String n_nick = nick[1].trim();
-						model.sendEvent(new JoinEvent(n_nick, model.getCurrentServer().getNick()));
-						view.getConnectionList().addChannel(model.getCurrentServer().getHost(), n_nick);
-				}
-				else if (command.startsWith("/part")) {
+					model.sendEvent(new JoinEvent(n_nick, model
+							.getCurrentServer().getNick()));
+					view.getConnectionList().addChannel(
+							model.getCurrentServer().getHost(), n_nick);
+				} else if (command.startsWith("/part")) {
 					String[] nick = command.split(" ");
 					String n_nick;
 					if (nick.length == 2)
@@ -160,15 +161,14 @@ public class Controller implements TreeSelectionListener, ActionListener {
 					else
 						n_nick = model.getCurrentServer().getCurrentChannel()
 								.getName();
-						model.sendEvent(
-								new PartEvent(n_nick, model.getCurrentServer()
-										.getNick()));
-						model.getCurrentServer().setCurrentChannel(null);
-						model.getCurrentServer().removeChannel(n_nick);
-						view.getConnectionList().removeChannel(
-								model.getCurrentServer().getHost(), n_nick);
-						view.getConnectionList().selectServer(
-								model.getCurrentServer().getHost());
+					model.sendEvent(new PartEvent(n_nick, model
+							.getCurrentServer().getNick()));
+					model.getCurrentServer().setCurrentChannel(null);
+					model.getCurrentServer().removeChannel(n_nick);
+					view.getConnectionList().removeChannel(
+							model.getCurrentServer().getHost(), n_nick);
+					view.getConnectionList().selectServer(
+							model.getCurrentServer().getHost());
 				} else if (command.startsWith("/topic ")) {
 					String c = model.getCurrentServer().getCurrentChannel()
 							.getName();
@@ -177,10 +177,9 @@ public class Controller implements TreeSelectionListener, ActionListener {
 				}
 
 				else
-					model.sendEvent(
-							new PrivmsgEvent(model.getCurrentServer()
-									.getCurrentChannel().getName(), command,
-									model.getCurrentServer().getNick()));
+					model.sendEvent(new PrivmsgEvent(model.getCurrentServer()
+							.getCurrentChannel().getName(), command, model
+							.getCurrentServer().getNick()));
 			}
 		});
 	}

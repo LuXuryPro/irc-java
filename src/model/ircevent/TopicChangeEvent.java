@@ -1,4 +1,4 @@
-package Model.IRCEvent;
+package model.ircevent;
 
 public class TopicChangeEvent extends IRCEvent {
 	private String user;
