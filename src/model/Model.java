@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import model.ircevent.IRCEvent;
+import model.ircevent.QuitEvent;
 
 public class Model {
 	private ArrayList<Server> servers;
@@ -63,16 +64,12 @@ public class Model {
 	
 	/**
 	 * Wait for any connection become active
+	 * @throws InterruptedException 
 	 */
-	public synchronized void waitIsConnected()
+	public synchronized void waitIsConnected() throws InterruptedException
 	{
 		while(!this.connected)
-			try {
 				wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 	}
 	
 	/**
@@ -97,7 +94,33 @@ public class Model {
 			}
 		}
 	}
-	
+
+	public synchronized void removeServer(String host) {
+		for (int i = 0; i < this.servers.size(); i++)
+		{
+			if (this.servers.get(i).getHost().equals(host))
+			{
+                if (this.current_server == this.servers.get(i))
+                	this.current_server = null;
+                this.servers.get(i).disconnect();
+                this.servers.remove(i);
+                if (this.servers.size() == 0)
+                	this.connected = false;
+                else
+                	this.current_server = this.servers.get(0);
+                return;
+			}
+		}
+	}
+
+	public void clear()
+	{
+		for (Server s: this.servers)
+		{
+			s.sendEvent(new QuitEvent(""));
+			s.disconnect();
+		}
+	}
 	/**
 	 * Send event to current active server
 	 * @param e event to send
@@ -105,5 +128,10 @@ public class Model {
 	public void sendEvent(IRCEvent e){
 		if (this.current_server != null)
 			this.current_server.sendEvent(e);
+	}
+	
+	public int getServerCount()
+	{
+		return this.servers.size();
 	}
 }

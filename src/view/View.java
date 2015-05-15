@@ -10,12 +10,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import controller.Controller;
 
@@ -27,6 +28,8 @@ public class View {
 	private final JPanel channel_panel;
 	private final JTextField entry;
 	private final JLabel topic;
+	private final JEditorPane text;
+	private final JScrollPane text_scroll;
 
 	/**
 	 * @return ConnectionList object of view
@@ -52,7 +55,7 @@ public class View {
 	/**
 	 * @return main text object
 	 */
-	public JTextArea getText() {
+	public JEditorPane getText() {
 		return text;
 	}
 
@@ -62,8 +65,6 @@ public class View {
 	public JScrollPane getText_scroll() {
 		return text_scroll;
 	}
-	private final JTextArea text;
-	private final JScrollPane text_scroll;
 		
 	public View() {
 		frame = new JFrame();
@@ -80,14 +81,13 @@ public class View {
 		this.usersList = new UsersList();
 		this.usersList.setBackground(new Color(0x1C, 0x1C, 0x1C));
 		this.usersList.setForeground(new Color(0xFF, 0xFF, 0xFF));
-		this.text = new JTextArea();
+		this.text = new JEditorPane();
+		this.text.setContentType("text/html");
 		this.text.setEditable(false);
 		this.text.setBackground(new Color(0x1C, 0x1C, 0x1C));
 		this.text.setForeground(new Color(0xFF, 0xFF, 0xFF));
-		this.text.setLineWrap(true);
-		this.text.setWrapStyleWord(true);
 		this.text_scroll = new JScrollPane(this.text,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		JPanel p = new JPanel();
@@ -141,5 +141,9 @@ public class View {
 	public void clearText() {
 		this.text.setText("");
 	}
-    
+    public void dispose()
+    {
+    	this.frame.setVisible(false);
+    	this.frame.dispose();
+    }
 }

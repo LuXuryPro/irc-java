@@ -8,7 +8,7 @@ public class PrivmsgEvent extends IRCEvent {
 	private final String msg;
 
 	public PrivmsgEvent(String channel, String msg, String user) {
-		super("PRIVMSG",channel);
+		super("PRIVMSG", channel);
 		this.msg = msg;
 		this.user = user;
 	}
@@ -20,8 +20,11 @@ public class PrivmsgEvent extends IRCEvent {
 
 	@Override
 	public String generateDisplayString() {
-		return String.format("[%02d:%02d] <%s> %s", this.timestamp.get(Calendar.HOUR_OF_DAY),
-				this.timestamp.get(Calendar.MINUTE),this.user, this.msg);
+		return String
+				.format("[%02d:%02d] <font color = '#5FD7FF'>&lt;%s&gt;</font> %s",
+						this.timestamp.get(Calendar.HOUR_OF_DAY),
+						this.timestamp.get(Calendar.MINUTE), this.user,
+						this.msg);
 	}
 
 }

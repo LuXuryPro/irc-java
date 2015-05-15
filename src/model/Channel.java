@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import model.User.UserMode;
 import model.ircevent.IRCEvent;
 import model.ircevent.JoinEvent;
+import model.ircevent.ModeEvent;
 import model.ircevent.NamesEvent;
 import model.ircevent.PartEvent;
 import model.ircevent.TopicChangeEvent;
@@ -15,6 +16,7 @@ public class Channel {
 	private String topic;
 	private ArrayList<User> users;
 	private ArrayList<IRCEvent> events;
+	private boolean nicks_recived = false;
 
 	/**
 	 * Create new channel
@@ -37,6 +39,11 @@ public class Channel {
 			for (User s : ((NamesEvent) e).getNicks()) {
 				if (this.getUserByName(s.getName()) == null)
 					this.users.add(s);
+				else if (this.getUserByName(s.getName()).getMode() != s.getMode())
+				{
+					this.users.remove(this.getUserByName(s.getName()));
+					this.users.add(s);
+				}
 			}
 		}
 		else if (e instanceof JoinEvent) {
@@ -52,6 +59,21 @@ public class Channel {
 		}
 		else if (e instanceof TopicChangeEvent) {
 			this.topic = ((TopicChangeEvent) e).getTopic();
+		}
+		else if (e instanceof ModeEvent) {
+			String new_mode =((ModeEvent) e).getNewMode();
+			String au = ((ModeEvent) e).getAffectedUser();
+			if (this.getUserByName(au) != null)
+			{
+				if (new_mode.equals("+o"))
+					this.getUserByName(au).setMode(UserMode.OP);
+				else if (new_mode.equals("+v"))
+					this.getUserByName(au).setMode(UserMode.VOICE);
+				else if (new_mode.equals("-o"))
+					this.getUserByName(au).setMode(UserMode.NORMAL);
+				else if (new_mode.equals("-o"))
+					this.getUserByName(au).setMode(UserMode.NORMAL);
+			}
 		}
 		this.notifyAll();
 	}

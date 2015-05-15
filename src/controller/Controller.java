@@ -12,6 +12,8 @@ import javax.swing.event.TreeSelectionListener;
 import view.View;
 import model.Model;
 import model.User;
+import model.ircevent.ModeEvent;
+import model.ircevent.QuitEvent;
 import model.ircevent.IRCEvent;
 import model.ircevent.JoinEvent;
 import model.ircevent.NickEvent;
@@ -25,7 +27,9 @@ import model.ircevent.TopicChangeEvent;
 public class Controller implements TreeSelectionListener, ActionListener {
 	/**
 	 * Start point of application
-	 * @param args arguments from os
+	 * 
+	 * @param args
+	 *            arguments from os
 	 */
 	public static void main(String[] args) {
 		new Controller(new View(), new Model("ArP"));
@@ -34,10 +38,13 @@ public class Controller implements TreeSelectionListener, ActionListener {
 	private final View view;
 	private final Model model;
 	private final Thread main_thread;
+	private boolean stop = false;
 
 	/**
-	 * @param v View to control
-	 * @param m Model to use
+	 * @param v
+	 *            View to control
+	 * @param m
+	 *            Model to use
 	 */
 	public Controller(View v, Model m) {
 		this.view = v;
@@ -56,49 +63,43 @@ public class Controller implements TreeSelectionListener, ActionListener {
 	private void main_run() {
 		while (true) {
 			try {
-				model.waitIsConnected();
 				ArrayList<IRCEvent> e;
+				model.waitIsConnected();
 				e = this.model.getCurrentServer().getCurrentChannel()
 						.waitForEvents();
-
-				final StringBuffer b = new StringBuffer();
-				for (IRCEvent ev : e) {
-					if (ev.generateDisplayString() != null)
-						b.append(ev.generateDisplayString() + "\n");
-				}
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						view.setText(b.toString());
-						view.getUsersList().clear();
-						for (User u : model.getCurrentServer()
-								.getCurrentChannel().getUsers())
-							view.getUsersList().addUser(u.toString());
-						view.setTopic(model.getCurrentServer()
-								.getCurrentChannel().getTopic());
-					}
-				});
+				this.update_gui(e);
 			} catch (InterruptedException e1) {
-				final StringBuffer b = new StringBuffer();
-				for (IRCEvent ev : model.getCurrentServer().getCurrentChannel()
-						.getEvents()) {
-					if (ev.generateDisplayString() != null)
-						b.append(ev.generateDisplayString() + "\n");
-				}
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						view.setText(b.toString());
-						view.getUsersList().clear();
-						for (User u : model.getCurrentServer()
-								.getCurrentChannel().getUsers())
-							view.getUsersList().addUser(u.toString());
-						view.setTopic(model.getCurrentServer()
-								.getCurrentChannel().getTopic());
-					}
-				});
+				if(this.model.getCurrentServer() != null)
+					this.update_gui(this.model.getCurrentServer().getCurrentChannel().getEvents());
+				else
+					this.view.setText("");
+				if (this.stop)
+					break;
 			}
 		}
+	}
+
+	private void update_gui(final ArrayList<IRCEvent> e) {
+		if (e == null)
+			return;
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				StringBuffer b = new StringBuffer();
+				b.append("<font color = 'white' face = 'monospace'>");
+				for (IRCEvent ev : e)
+					if (ev.generateDisplayString() != null)
+						b.append(ev.generateDisplayString() + "<br>");
+				b.append("</font>");
+				view.setText(b.toString());
+				view.getUsersList().clear();
+				for (User u : model.getCurrentServer().getCurrentChannel()
+						.getUsers())
+					view.getUsersList().addUser(u.toString());
+				view.setTopic(model.getCurrentServer().getCurrentChannel()
+						.getTopic());
+			}
+		});
 	}
 
 	@Override
@@ -122,7 +123,6 @@ public class Controller implements TreeSelectionListener, ActionListener {
 						model.getCurrentServer().setCurrentChannel(c);
 						main_thread.interrupt();
 					}
-
 			}
 		});
 
@@ -130,11 +130,11 @@ public class Controller implements TreeSelectionListener, ActionListener {
 
 	@Override
 	public void actionPerformed(final ActionEvent ae) {
+		((JTextField) (ae.getSource())).setText("");
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				String command = ae.getActionCommand().trim();
-				((JTextField) (ae.getSource())).setText("");
 				if (command.startsWith("/connect")) {
 					String[] server = command.split(" ");
 					String host = server[1];
@@ -143,6 +143,17 @@ public class Controller implements TreeSelectionListener, ActionListener {
 						view.getConnectionList().addServer(host);
 						main_thread.interrupt();
 					}
+				} else if (command.startsWith("/disconnect")) {
+					model.sendEvent(new QuitEvent(""));
+					view.getConnectionList().removeServer(model.getCurrentServer().getHost());
+					view.getUsersList().clear();
+					model.removeServer(model.getCurrentServer().getHost());
+					main_thread.interrupt();
+				} else if (command.startsWith("/exit")) {
+					model.clear();
+					stop = true;
+					main_thread.interrupt();
+					view.dispose();
 				} else if (command.startsWith("/nick")) {
 					String[] nick = command.split(" ");
 					String n_nick = nick[1];
@@ -154,6 +165,11 @@ public class Controller implements TreeSelectionListener, ActionListener {
 							.getCurrentServer().getNick()));
 					view.getConnectionList().addChannel(
 							model.getCurrentServer().getHost(), n_nick);
+				} else if (command.startsWith("/mode")) {
+					String[] nick = command.split(" ");
+					String n_nick = nick[1].trim();
+					String new_m = nick[2].trim();
+					model.sendEvent(new ModeEvent("", model.getCurrentServer().getCurrentChannel().getName(), n_nick, new_m));
 				} else if (command.startsWith("/part")) {
 					String[] nick = command.split(" ");
 					String n_nick;

@@ -12,6 +12,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import model.ircevent.QuitEvent;
 import model.ircevent.IRCEvent;
 import model.ircevent.JoinEvent;
 import model.ircevent.NickEvent;
@@ -39,33 +40,42 @@ public class Server {
 	BlockingQueue<IRCEvent> output_events;
 	BlockingQueue<IRCEvent> register_events;
 	private boolean registred;
+	private boolean disconnecting = false;
 
-	
 	/**
-	 * @param nick nick to set on server
-	 * @param host host name 
+	 * @param nick
+	 *            nick to set on server
+	 * @param host
+	 *            host name
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	public Server(String nick, String host) throws UnknownHostException, IOException {
-		this(nick,host,6667);
+	public Server(String nick, String host) throws UnknownHostException,
+			IOException {
+		this(nick, host, 6667);
 	}
-	
+
 	/**
-	 * @param nick nick to set on server
-	 * @param host host name 
-	 * @param port port of host
+	 * @param nick
+	 *            nick to set on server
+	 * @param host
+	 *            host name
+	 * @param port
+	 *            port of host
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	public Server(String nick, String host, int port) throws UnknownHostException, IOException {
+	public Server(String nick, String host, int port)
+			throws UnknownHostException, IOException {
 		super();
 		this.nick = nick;
 		this.host = host;
 		this.port = port;
 		this.socket = new Socket(host, port);
-		this.writer = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
-		this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+		this.writer = new BufferedWriter(new OutputStreamWriter(
+				this.socket.getOutputStream()));
+		this.reader = new BufferedReader(new InputStreamReader(
+				this.socket.getInputStream()));
 		this.output_events = new LinkedBlockingQueue<>();
 		this.register_events = new LinkedBlockingDeque<>();
 		this.out_thread = new Thread(new Runnable() {
@@ -84,16 +94,27 @@ public class Server {
 		this.root_channel = new Channel("");
 		this.current_channel = this.root_channel;
 	}
-	
+
 	/**
 	 * connect to server
 	 */
 	public void connect() {
-
 		this.in_thread.start();
 		this.out_thread.start();
 	}
-	
+
+	public void disconnect() {
+		try {
+			this.disconnecting = true;
+			this.in_thread.interrupt();
+			this.out_thread.interrupt();
+			this.writer.close();
+			this.reader.close();
+			this.socket.close();
+		} catch (IOException e) {
+		}
+	}
+
 	private void in() {
 		String line;
 		while (true) {
@@ -102,24 +123,26 @@ public class Server {
 					if (line.startsWith("PING ")) {
 						IRCEvent e = new PingEvent(line.substring(5));
 						this.sendEvent(new PongEvent(((PingEvent) e).getId()));
-					} else if (line.contains("004")) {
-						this.setRegistred(true);
-						this.out_thread.interrupt();
-					}
-					else if (line.startsWith(":")) {
+					} else if (line.startsWith(":")) {
+						if (line.contains("004")) {
+							this.setRegistred(true);
+							this.out_thread.interrupt();
+						}
 						IRCEvent e = Parser.parse(line);
-						this.getChannel(e.getChannel()).addEvent(e);
+						if (e != null)
+							this.getChannel(e.getChannel()).addEvent(e);
 					}
 				}
 			} catch (IOException ex) {
-				break;
+				if (this.disconnecting)
+					break;
 			}
 		}
 	}
 
 	private void out() {
-        this.sendEvent(new UserEvent(this.nick));
-        this.sendEvent(new NickEvent(this.nick));
+		this.sendEvent(new UserEvent(this.nick));
+		this.sendEvent(new NickEvent(this.nick));
 		while (true) {
 			try {
 				IRCEvent m;
@@ -130,22 +153,27 @@ public class Server {
 				}
 				if (m != null) {
 					if (m instanceof JoinEvent)
-						this.channels.add(new Channel(((JoinEvent) m).getChannelName()));
+						this.channels.add(new Channel(((JoinEvent) m)
+								.getChannelName()));
 					else if (m instanceof PrivmsgEvent)
 						this.getCurrentChannel().addEvent(m);
 					writer.write("" + m.generateRawString() + "\r\n");
 					writer.flush();
+					if (m instanceof QuitEvent)
+						this.disconnecting = true;
 				}
 
 			} catch (IOException | InterruptedException ex) {
+				if (this.disconnecting)
+					break;
 			}
 		}
 
 	}
-	
-	
+
 	/**
 	 * Check if user is registered on server
+	 * 
 	 * @return true if user is registered
 	 */
 	public synchronized boolean isRegistred() {
@@ -154,27 +182,30 @@ public class Server {
 
 	/**
 	 * Set if user is registered
-	 * @param registred new boolean registered value
+	 * 
+	 * @param registred
+	 *            new boolean registered value
 	 */
 	public synchronized void setRegistred(boolean registred) {
 		this.registred = registred;
 	}
-	
+
 	/**
 	 * Send event to server
-	 * @param m Event to send
+	 * 
+	 * @param m
+	 *            Event to send
 	 */
 	public void sendEvent(IRCEvent m) {
 
-		if (!this.isRegistred() && (m instanceof NickEvent
-			|| m instanceof UserEvent
-			|| m instanceof PongEvent)) {
+		if (!this.isRegistred()
+				&& (m instanceof NickEvent || m instanceof UserEvent || m instanceof PongEvent)) {
 			register_events.offer(m);
 		} else {
 			output_events.offer(m);
 		}
 	}
-	
+
 	/**
 	 * @return server's current channel selected for communication
 	 */
@@ -184,18 +215,18 @@ public class Server {
 
 	/**
 	 * Set channel to be current
-	 * @param name name of channel to set
+	 * 
+	 * @param name
+	 *            name of channel to set
 	 */
 	public synchronized void setCurrentChannel(String name) {
 		if (name == null) {
 			this.current_channel = this.root_channel;
 			return;
 		}
-		
-		for (int i = 0; i < this.channels.size(); i++)
-		{
-			if (this.channels.get(i).getName() == name)
-			{
+
+		for (int i = 0; i < this.channels.size(); i++) {
+			if (this.channels.get(i).getName() == name) {
 				this.current_channel = this.channels.get(i);
 				return;
 			}
@@ -204,59 +235,60 @@ public class Server {
 
 	/**
 	 * Get channel by name
-	 * @param name name of channel
+	 * 
+	 * @param name
+	 *            name of channel
 	 * @return Channel of given name
 	 */
 	public synchronized Channel getChannel(String name) {
 		if (name == null) {
 			return this.root_channel;
 		}
-		
-		for (int i = 0; i < this.channels.size(); i++)
-		{
-			if (this.channels.get(i).getName().equals(name))
-			{
+
+		for (int i = 0; i < this.channels.size(); i++) {
+			if (this.channels.get(i).getName().equals(name)) {
 				return this.channels.get(i);
 			}
 		}
 		return this.root_channel;
 	}
-	
+
 	/**
 	 * @return server's host name
 	 */
 	public synchronized String getHost() {
 		return host;
 	}
-	
+
 	/**
 	 * Create new channel
-	 * @param name name of new channel
+	 * 
+	 * @param name
+	 *            name of new channel
 	 */
-	public void addChannel(String name)
-	{
+	public void addChannel(String name) {
 		this.channels.add(new Channel(name));
 	}
-	
+
 	/**
 	 * Remove channel from server by name
-	 * @param name name of channel to remove
+	 * 
+	 * @param name
+	 *            name of channel to remove
 	 */
-	public void removeChannel(String name)
-	{
+	public void removeChannel(String name) {
 		if (name == null) {
 			return;
 		}
-		
-		for (int i = 0; i < this.channels.size(); i++)
-		{
-			if (this.channels.get(i).getName().equals(name))
-			{
+
+		for (int i = 0; i < this.channels.size(); i++) {
+			if (this.channels.get(i).getName().equals(name)) {
 				this.channels.remove(i);
 				return;
 			}
 		}
 	}
+
 	/**
 	 * @return nick of user on server
 	 */

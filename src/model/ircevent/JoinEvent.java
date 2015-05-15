@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.ircevent;
 
 public class JoinEvent extends IRCEvent {
@@ -25,7 +20,7 @@ public class JoinEvent extends IRCEvent {
 
 	@Override
 	public String generateDisplayString() {
-		return String.format("-->Użytkownik %s wchodzi na kanał %s", this.user, this.channel); 
+		return String.format("<font color = '#87FF00'>--&gt;Użytkownik %s wchodzi na kanał %s</font>", this.user, this.channel); 
 	}
 
 	public synchronized String getUser() {
