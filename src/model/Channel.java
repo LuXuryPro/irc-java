@@ -1,5 +1,9 @@
 package model;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import model.User.UserMode;
@@ -7,6 +11,7 @@ import model.ircevent.IRCEvent;
 import model.ircevent.JoinEvent;
 import model.ircevent.ModeEvent;
 import model.ircevent.NamesEvent;
+import model.ircevent.NickEvent;
 import model.ircevent.PartEvent;
 import model.ircevent.TopicChangeEvent;
 import model.ircevent.TopicEvent;
@@ -16,11 +21,12 @@ public class Channel {
 	private String topic;
 	private ArrayList<User> users;
 	private ArrayList<IRCEvent> events;
-	private boolean nicks_recived = false;
 
 	/**
 	 * Create new channel
-	 * @param name channel name
+	 * 
+	 * @param name
+	 *            channel name
 	 */
 	public Channel(String name) {
 		this.name = name;
@@ -31,7 +37,9 @@ public class Channel {
 
 	/**
 	 * Add new event to channel
-	 * @param e Event to add
+	 * 
+	 * @param e
+	 *            Event to add
 	 */
 	public synchronized void addEvent(IRCEvent e) {
 		this.events.add(e);
@@ -39,32 +47,27 @@ public class Channel {
 			for (User s : ((NamesEvent) e).getNicks()) {
 				if (this.getUserByName(s.getName()) == null)
 					this.users.add(s);
-				else if (this.getUserByName(s.getName()).getMode() != s.getMode())
-				{
+				else if (this.getUserByName(s.getName()).getMode() != s
+						.getMode()) {
 					this.users.remove(this.getUserByName(s.getName()));
 					this.users.add(s);
 				}
 			}
-		}
-		else if (e instanceof JoinEvent) {
+		} else if (e instanceof JoinEvent) {
 			if (this.getUserByName(((JoinEvent) e).getUser()) == null)
-				this.users.add(new User(((JoinEvent) e).getUser(),UserMode.NORMAL));
-			}
-		else if (e instanceof PartEvent) {
+				this.users.add(new User(((JoinEvent) e).getUser(),
+						UserMode.NORMAL));
+		} else if (e instanceof PartEvent) {
 			if (this.getUserByName(((PartEvent) e).getUser()) != null)
 				this.removeUser(((PartEvent) e).getUser());
-		}
-		else if (e instanceof TopicEvent) {
+		} else if (e instanceof TopicEvent) {
 			this.topic = ((TopicEvent) e).getTopic();
-		}
-		else if (e instanceof TopicChangeEvent) {
+		} else if (e instanceof TopicChangeEvent) {
 			this.topic = ((TopicChangeEvent) e).getTopic();
-		}
-		else if (e instanceof ModeEvent) {
-			String new_mode =((ModeEvent) e).getNewMode();
+		} else if (e instanceof ModeEvent) {
+			String new_mode = ((ModeEvent) e).getNewMode();
 			String au = ((ModeEvent) e).getAffectedUser();
-			if (this.getUserByName(au) != null)
-			{
+			if (this.getUserByName(au) != null) {
 				if (new_mode.equals("+o"))
 					this.getUserByName(au).setMode(UserMode.OP);
 				else if (new_mode.equals("+v"))
@@ -74,13 +77,17 @@ public class Channel {
 				else if (new_mode.equals("-o"))
 					this.getUserByName(au).setMode(UserMode.NORMAL);
 			}
+		} else if (e instanceof NickEvent) {
+			this.getUserByName(((NickEvent) e).getOldNick()).setName(((NickEvent) e).getNewNick());
 		}
 		this.notifyAll();
 	}
 
 	/**
 	 * Find user on channel
-	 * @param name name of user
+	 * 
+	 * @param name
+	 *            name of user
 	 * @return User object on channel
 	 */
 	public User getUserByName(String name) {
@@ -91,24 +98,23 @@ public class Channel {
 		return null;
 	}
 
-	
 	/**
 	 * Remove user from channel
-	 * @param name name of user to remove
+	 * 
+	 * @param name
+	 *            name of user to remove
 	 */
-	public void removeUser(String name)
-	{
+	public void removeUser(String name) {
 		int i = 0;
-		for (User u : this.users)
-		{
-			if (u.getName().equals(name))
-			{
+		for (User u : this.users) {
+			if (u.getName().equals(name)) {
 				this.users.remove(i);
 				return;
 			}
 			i++;
 		}
 	}
+
 	/**
 	 * @return name of channel
 	 */
@@ -125,7 +131,8 @@ public class Channel {
 	}
 
 	/**
-	 * Wait on channel's mutex for new events 
+	 * Wait on channel's mutex for new events
+	 * 
 	 * @return copy of all events in channel including new events
 	 * @throws InterruptedException
 	 */
@@ -149,14 +156,26 @@ public class Channel {
 	public synchronized String getTopic() {
 		return topic;
 	}
-	
+
 	/**
 	 * Save all events on channel to file
-	 * @param file_name name of output file
+	 * 
+	 * @param file_name
+	 *            name of output file
 	 */
-	public void saveToFile(String file_name)
-	{}
-	
-	
+	public synchronized void saveToFile(String file_name) {
+		try {
+			File f = new File(file_name);
+			BufferedWriter w = new BufferedWriter(new FileWriter(f));
+			w.write("<body bgcolor = '#1C1C1C'><font color = 'white' face = 'monospace'>");
+			for (IRCEvent e : this.events)
+				w.write(e.generateDisplayString() + "<br>");
+			w.write("</font></body>");
+			w.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

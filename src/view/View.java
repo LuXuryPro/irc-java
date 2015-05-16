@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import controller.Controller;
 
@@ -28,6 +29,8 @@ public class View {
 	private final JPanel channel_panel;
 	private final JTextField entry;
 	private final JLabel topic;
+	private final JLabel users_count;
+	private final JLabel nick;
 	private final JEditorPane text;
 	private final JScrollPane text_scroll;
 
@@ -78,6 +81,15 @@ public class View {
 		this.entry.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		this.entry.setCaretColor(Color.WHITE);
 		this.entry.setFont(new Font("Monospace", Font.PLAIN, 15));
+		this.nick = new JLabel("",SwingConstants.CENTER);
+		this.nick.setOpaque(true);
+		this.nick.setBackground(new Color(0x1C, 0x1C, 0x1C));
+		this.nick.setForeground(new Color(0xFF, 0xFF, 0xFF));
+		this.nick.setPreferredSize(new Dimension(50, 20));
+		JPanel p3 = new JPanel();
+		p3.setLayout(new BorderLayout(5,5));
+		p3.add(nick,BorderLayout.WEST);
+		p3.add(entry,BorderLayout.CENTER);
 		this.usersList = new UsersList();
 		this.usersList.setBackground(new Color(0x1C, 0x1C, 0x1C));
 		this.usersList.setForeground(new Color(0xFF, 0xFF, 0xFF));
@@ -102,9 +114,18 @@ public class View {
 		p.add(this.text_scroll, BorderLayout.CENTER);
 		this.channel_panel = new JPanel();
 		this.channel_panel.setLayout(new BorderLayout(5,5));
-		this.channel_panel.add(entry ,BorderLayout.SOUTH);
+		this.channel_panel.add(p3 ,BorderLayout.SOUTH);
 		this.channel_panel.add(p, BorderLayout.CENTER);
-		this.channel_panel.add(this.usersList, BorderLayout.EAST);
+		JPanel p2 = new JPanel();
+		p2.setLayout(new BorderLayout(5,5));
+		this.users_count = new JLabel("",SwingConstants.CENTER);
+		this.users_count.setPreferredSize(new Dimension(0, 20));
+		this.users_count.setOpaque(true);
+		this.users_count.setBackground(new Color(0x1C, 0x1C, 0x1C));
+		this.users_count.setForeground(new Color(0xFF, 0xFF, 0xFF));
+		p2.add(this.users_count, BorderLayout.NORTH);
+		p2.add(this.usersList,BorderLayout.CENTER);
+		this.channel_panel.add(p2, BorderLayout.EAST);
 		this.frame.add(this.channel_panel, BorderLayout.CENTER);
 		frame.setVisible(true);
 	}
@@ -127,7 +148,10 @@ public class View {
 		this.text.setText(text);
 		this.text.setCaretPosition(this.text.getDocument().getLength());
 	}
-	
+	public void setNick(String nick)
+	{
+		this.nick.setText(nick);
+	}
 	/**
 	 * Set topic label to given text
 	 * @param text text to set in topic label
@@ -146,4 +170,8 @@ public class View {
     	this.frame.setVisible(false);
     	this.frame.dispose();
     }
+
+	public JLabel getUsersCount() {
+		return users_count;
+	}
 }

@@ -129,8 +129,24 @@ public class Server {
 							this.out_thread.interrupt();
 						}
 						IRCEvent e = Parser.parse(line);
-						if (e != null)
+						if (e != null) {
+							if (e instanceof PrivmsgEvent) {
+								if (((PrivmsgEvent) e).getMsg().contains(
+										this.nick))
+									((PrivmsgEvent) e).setImortant(true);
+							} else if (e instanceof NickEvent) {
+								for (Channel c : this.channels) {
+									if (c.getUserByName(((NickEvent) e)
+											.getOldNick()) != null) {
+										c.addEvent(e);
+									}
+								}
+								if (((NickEvent) e).getOldNick().equals(this.nick))
+									this.nick = ((NickEvent) e).getNewNick();
+								continue;
+							}
 							this.getChannel(e.getChannel()).addEvent(e);
+						}
 					}
 				}
 			} catch (IOException ex) {
@@ -141,7 +157,7 @@ public class Server {
 	}
 
 	private void out() {
-		this.sendEvent(new UserEvent(this.nick));
+		this.sendEvent(new UserEvent(this.nick,"real_name"));
 		this.sendEvent(new NickEvent(this.nick));
 		while (true) {
 			try {

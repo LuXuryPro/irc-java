@@ -3,6 +3,8 @@ package controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -12,6 +14,7 @@ import javax.swing.event.TreeSelectionListener;
 import view.View;
 import model.Model;
 import model.User;
+import model.ircevent.IRCActionEvent;
 import model.ircevent.ModeEvent;
 import model.ircevent.QuitEvent;
 import model.ircevent.IRCEvent;
@@ -19,6 +22,7 @@ import model.ircevent.JoinEvent;
 import model.ircevent.NickEvent;
 import model.ircevent.PartEvent;
 import model.ircevent.PrivmsgEvent;
+import model.ircevent.RAWEvent;
 import model.ircevent.TopicChangeEvent;
 
 /**
@@ -69,8 +73,9 @@ public class Controller implements TreeSelectionListener, ActionListener {
 						.waitForEvents();
 				this.update_gui(e);
 			} catch (InterruptedException e1) {
-				if(this.model.getCurrentServer() != null)
-					this.update_gui(this.model.getCurrentServer().getCurrentChannel().getEvents());
+				if (this.model.getCurrentServer() != null)
+					this.update_gui(this.model.getCurrentServer()
+							.getCurrentChannel().getEvents());
 				else
 					this.view.setText("");
 				if (this.stop)
@@ -86,11 +91,11 @@ public class Controller implements TreeSelectionListener, ActionListener {
 			@Override
 			public void run() {
 				StringBuffer b = new StringBuffer();
-				b.append("<font color = 'white' face = 'monospace'>");
+				b.append("<body bgcolor='#1C1C1C'><font color = 'white' face = 'monospace'>");
 				for (IRCEvent ev : e)
 					if (ev.generateDisplayString() != null)
 						b.append(ev.generateDisplayString() + "<br>");
-				b.append("</font>");
+				b.append("</font></body>");
 				view.setText(b.toString());
 				view.getUsersList().clear();
 				for (User u : model.getCurrentServer().getCurrentChannel()
@@ -98,6 +103,8 @@ public class Controller implements TreeSelectionListener, ActionListener {
 					view.getUsersList().addUser(u.toString());
 				view.setTopic(model.getCurrentServer().getCurrentChannel()
 						.getTopic());
+				view.setNick(model.getCurrentServer().getNick());
+				view.getUsersCount().setText(String.valueOf(model.getCurrentServer().getCurrentChannel().getUsers().size()));
 			}
 		});
 	}
@@ -145,7 +152,8 @@ public class Controller implements TreeSelectionListener, ActionListener {
 					}
 				} else if (command.startsWith("/disconnect")) {
 					model.sendEvent(new QuitEvent(""));
-					view.getConnectionList().removeServer(model.getCurrentServer().getHost());
+					view.getConnectionList().removeServer(
+							model.getCurrentServer().getHost());
 					view.getUsersList().clear();
 					model.removeServer(model.getCurrentServer().getHost());
 					main_thread.interrupt();
@@ -154,6 +162,9 @@ public class Controller implements TreeSelectionListener, ActionListener {
 					stop = true;
 					main_thread.interrupt();
 					view.dispose();
+				} else if (command.startsWith("/save")) {
+					model.getCurrentServer().getCurrentChannel()
+							.saveToFile(command.split(" ")[1]);
 				} else if (command.startsWith("/nick")) {
 					String[] nick = command.split(" ");
 					String n_nick = nick[1];
@@ -169,7 +180,8 @@ public class Controller implements TreeSelectionListener, ActionListener {
 					String[] nick = command.split(" ");
 					String n_nick = nick[1].trim();
 					String new_m = nick[2].trim();
-					model.sendEvent(new ModeEvent("", model.getCurrentServer().getCurrentChannel().getName(), n_nick, new_m));
+					model.sendEvent(new ModeEvent("", model.getCurrentServer()
+							.getCurrentChannel().getName(), n_nick, new_m));
 				} else if (command.startsWith("/part")) {
 					String[] nick = command.split(" ");
 					String n_nick;
@@ -191,9 +203,32 @@ public class Controller implements TreeSelectionListener, ActionListener {
 							.getName();
 					model.getCurrentServer().sendEvent(
 							new TopicChangeEvent(c, command.substring(7)));
-				}
-
-				else
+				} else if (command.startsWith("/me")) {
+					model.sendEvent(new IRCActionEvent(model.getCurrentServer()
+							.getCurrentChannel().getName(), command
+							.substring(4), model.getCurrentServer().getNick()));
+				} else if (command.startsWith("/slap-all")) {
+					StringBuffer b = new StringBuffer();
+					for (User u : model.getCurrentServer().getCurrentChannel()
+							.getUsers())
+						b.append(u.getName() + " ");
+					model.sendEvent(new IRCActionEvent(model.getCurrentServer()
+							.getCurrentChannel().getName(), "slaps "
+							+ b.toString(), model.getCurrentServer().getNick()));
+				} else if (command.startsWith("/time")) {
+					Calendar time = new GregorianCalendar();
+					String t = String.format(
+							"------[%02d.%02d.%04d][%02d:%02d:%02d]------",
+							time.get(Calendar.DAY_OF_MONTH),
+							time.get(Calendar.MONTH), time.get(Calendar.YEAR),
+							time.get(Calendar.HOUR_OF_DAY),
+							time.get(Calendar.MINUTE),
+							time.get(Calendar.SECOND));
+					model.getCurrentServer().getCurrentChannel()
+							.addEvent(new RAWEvent(t));
+				} else if (command.startsWith("/dn")) {
+					model.setDefaultNick(command.substring(3));
+				} else
 					model.sendEvent(new PrivmsgEvent(model.getCurrentServer()
 							.getCurrentChannel().getName(), command, model
 							.getCurrentServer().getNick()));

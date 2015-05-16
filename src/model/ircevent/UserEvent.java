@@ -1,20 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.ircevent;
 
 public class UserEvent extends IRCEvent{
     private final String login;
-    public UserEvent(String login) {
+    private final String real_name;
+    public UserEvent(String login, String real_name) {
         super("USER");
         this.login = login;
+        this.real_name = real_name;
     }
     
     @Override
     public String generateRawString() {
-        return this.raw_string + " " + this.login + " 8 * :Java IRC Hacks Bot";
+        return this.raw_string + " " + this.login + " 8 * :" + this.real_name;
     }
 
 	@Override

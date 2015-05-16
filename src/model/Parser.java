@@ -1,5 +1,8 @@
 package model;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+
 import model.ircevent.*;
 
 public class Parser {
@@ -25,9 +28,15 @@ public class Parser {
 			if (meta[1].equals("PRIVMSG")) {
 				String user = meta[0].split("!")[0];
 				String channel = meta[2];
-				return new PrivmsgEvent(channel, data, user);
+				if (data.getBytes()[0] == 1) {
+					return new IRCActionEvent(channel, data.substring(8,
+							data.length() - 1), user);
+				} else
+					return new PrivmsgEvent(channel, data, user);
 			} else if (meta[1].equals("JOIN")) {
 				String user = meta[0].split("!")[0];
+				if (data != null)
+					return new JoinEvent(data, user);
 				String channel = meta[2];
 				return new JoinEvent(channel, user);
 			} else if (meta[1].equals("PART")) {
@@ -41,19 +50,31 @@ public class Parser {
 				String user = meta[0].split("!")[0];
 				String channel = meta[2];
 				return new TopicChangeEvent(user, channel, data);
+			} else if (meta[1].equals("MODE")) {
+				if (data == null) {
+					String user = meta[0].split("!")[0];
+					String channel = meta[2];
+					String new_mode = meta[3];
+					String affe = null;
+					if (meta.length == 5)
+						affe = meta[4];
+					return new ModeEvent(user, channel, affe, new_mode);
+				}
+				else {
+					String user = meta[0].split("!")[0];
+					String affe = meta[2];
+					return new ModeEvent(user, null, affe, data);
+				}
 			}
-			else if (meta[1].equals("MODE")) {
+			// :qdasdasdasd!webchat@user-164-127-116-240.play-internet.pl NICK
+			// :adddddccdc
+			else if (meta[1].equals("NICK")) {
 				String user = meta[0].split("!")[0];
-				String channel = meta[2];
-				String new_mode = meta[3];
-				String affe = null;
-				if (meta.length == 5)
-					affe = meta[4];
-				return new ModeEvent(user, channel, affe, new_mode);
+				return new NickEvent(user, data);
 			}
-			//:asdasdasd_!webchat@user-164-127-88-29.play-internet.pl MODE #e-sim.bt +o ArP
-		}
-		else {
+			// :asdasdasd_!webchat@user-164-127-88-29.play-internet.pl MODE
+			// #e-sim.bt +o ArP
+		} else {
 			if (meta[1].equals("353"))// names event
 			{
 				String channel = meta[4];
@@ -67,12 +88,11 @@ public class Parser {
 			else if (meta[1].equals("332")) {
 				String channel = meta[3];
 				return new TopicEvent(channel, data);
-			} else if (meta[1].matches("00[0-5]")
-					|| meta[1].matches("25[1-5]")
-					|| meta[1].matches("372")
-					)
+			} else if (meta[1].matches("00[0-5]") || meta[1].matches("25[1-5]")
+					|| meta[1].matches("372"))
 				return new ServerInfoEvent(data);
-			else if (meta[1].matches("376") || meta[1].matches("221"))
+			else if (meta[1].matches("376") || meta[1].matches("221")
+					|| meta[1].matches("366"))
 				return null;
 		}
 		return new RAWEvent(raw);

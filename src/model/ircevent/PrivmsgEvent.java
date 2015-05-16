@@ -4,8 +4,9 @@ import java.util.Calendar;
 
 public class PrivmsgEvent extends IRCEvent {
 
-	private final String user;
-	private final String msg;
+	protected final String user;
+	protected String msg;
+	protected boolean imortant = false;
 
 	public PrivmsgEvent(String channel, String msg, String user) {
 		super("PRIVMSG", channel);
@@ -20,11 +21,28 @@ public class PrivmsgEvent extends IRCEvent {
 
 	@Override
 	public String generateDisplayString() {
+		String b = "";
+		String eb = "";
+		if (this.imortant)
+		{
+			b = "<b><u>";
+			eb = "</u></b>";
+		}
 		return String
-				.format("[%02d:%02d] <font color = '#5FD7FF'>&lt;%s&gt;</font> %s",
+				.format(b + "[%02d:%02d] <font color = '#5FD7FF'>&lt;%s&gt;</font> %s" + eb,
 						this.timestamp.get(Calendar.HOUR_OF_DAY),
 						this.timestamp.get(Calendar.MINUTE), this.user,
-						this.msg);
+						this.msg.replaceAll("Kappa", "<img src = 'https://static-cdn.jtvnw.net/emoticons/v1/25/1.0'></img>")
+						.replaceAll("SSSsss", "<img src = 'https://static-cdn.jtvnw.net/emoticons/v1/46/1.0'></img>") 
+						);
 	}
 
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setImortant(boolean imortand) {
+		this.imortant = imortand;
+	}
+	
 }

@@ -6,22 +6,37 @@
 package model.ircevent;
 
 public class NickEvent extends IRCEvent{
-    private final String nick;
+    private final String new_nick;
+    private final String old_nick;
 
-    public NickEvent(String nick) {
+    public NickEvent(String new_nick) {
+        this("", new_nick);
+    }
+    
+    public NickEvent(String old_nick, String new_nick) {
         super("NICK");
-        this.nick = nick;
+        this.new_nick = new_nick;
+        this.old_nick = old_nick;
     }
     
     @Override
     public String generateRawString() {
-        return this.raw_string + " " + this.nick ;
+        return this.raw_string + " " + this.new_nick ;
     }
 
 	@Override
 	public String generateDisplayString() {
-		// TODO Auto-generated method stub
-		return null;
+		return String
+				.format("<font color = '#FF8700'> Użytkownik %s zmienia nick na %s</font>",
+						this.old_nick, this.new_nick);
+	}
+
+	public String getNewNick() {
+		return new_nick;
+	}
+
+	public String getOldNick() {
+		return old_nick;
 	}
     
 }
