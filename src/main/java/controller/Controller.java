@@ -31,9 +31,8 @@ import model.ircevent.TopicChangeEvent;
 public class Controller implements TreeSelectionListener, ActionListener {
 	/**
 	 * Start point of application
-	 * 
-	 * @param args
-	 *            arguments from os
+	 *
+	 * @param args arguments from os
 	 */
 	public static void main(String[] args) {
 		new Controller(new View(), new Model("ArP"));

@@ -13,7 +13,7 @@ public class Model {
 	private boolean connected = false;
 
 	private Server current_server = null;
-	
+
 	/**
 	 * Create new model
 	 * @param default_nick default nick to use in new server connections
@@ -23,7 +23,7 @@ public class Model {
 		this.default_nick = default_nick;
 		this.servers = new ArrayList<Server>();
 	}
-	
+
 	/**
 	 * @return current default nick
 	 */
@@ -38,7 +38,7 @@ public class Model {
 	public synchronized void setDefaultNick(String default_nick) {
 		this.default_nick = default_nick;
 	}
-	
+
 	/**
 	 * Connect model to new server
 	 * @param host host to connect to
@@ -61,17 +61,17 @@ public class Model {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * Wait for any connection become active
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public synchronized void waitIsConnected() throws InterruptedException
 	{
 		while(!this.connected)
 				wait();
 	}
-	
+
 	/**
 	 * @return current active server
 	 */
@@ -129,7 +129,7 @@ public class Model {
 		if (this.current_server != null)
 			this.current_server.sendEvent(e);
 	}
-	
+
 	public int getServerCount()
 	{
 		return this.servers.size();

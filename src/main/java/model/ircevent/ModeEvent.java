@@ -1,7 +1,4 @@
 package model.ircevent;
-
-import com.sun.corba.se.spi.servicecontext.UEInfoServiceContext;
-
 import model.User.UserMode;
 
 public class ModeEvent extends IRCEvent {
