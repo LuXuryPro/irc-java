@@ -29,14 +29,6 @@ import model.ircevent.TopicChangeEvent;
  * Controller class of MVC
  */
 public class Controller implements TreeSelectionListener, ActionListener {
-	/**
-	 * Start point of application
-	 *
-	 * @param args arguments from os
-	 */
-	public static void main(String[] args) {
-		new Controller(new View(), new Model("ArP"));
-	}
 
 	private final View view;
 	private final Model model;
