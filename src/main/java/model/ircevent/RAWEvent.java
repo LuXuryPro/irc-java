@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 public class RAWEvent extends IRCEvent{
 
 	public RAWEvent(String raw_string) {
@@ -16,5 +18,10 @@ public class RAWEvent extends IRCEvent{
 		return this.generateRawString();
 	}
 
-   
+	@Override
+	public void visit(Channel channel) {
+
+	}
+
+
 }

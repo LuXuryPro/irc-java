@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 public class QuitEvent extends IRCEvent {
 	private final String exit_message;
 
@@ -16,6 +18,11 @@ public class QuitEvent extends IRCEvent {
 	@Override
 	public String generateDisplayString() {
 		return null;
+	}
+
+	@Override
+	public void visit(Channel channel) {
+
 	}
 
 }

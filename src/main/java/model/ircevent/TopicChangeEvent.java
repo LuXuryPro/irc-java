@@ -1,6 +1,6 @@
 package model.ircevent;
 
-public class TopicChangeEvent extends IRCEvent {
+public class TopicChangeEvent extends TopicEvent{
 	private String user;
 	private String topic;
 	public TopicChangeEvent(String user, String channel, String topic) {

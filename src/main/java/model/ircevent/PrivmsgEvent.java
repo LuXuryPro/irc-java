@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 import java.util.Calendar;
 
 public class PrivmsgEvent extends IRCEvent {
@@ -35,6 +37,11 @@ public class PrivmsgEvent extends IRCEvent {
 						this.msg.replaceAll("Kappa", "<img src = 'https://static-cdn.jtvnw.net/emoticons/v1/25/1.0'></img>")
 						.replaceAll("SSSsss", "<img src = 'https://static-cdn.jtvnw.net/emoticons/v1/46/1.0'></img>") 
 						);
+	}
+
+	@Override
+	public void visit(Channel channel) {
+
 	}
 
 	public String getMsg() {

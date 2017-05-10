@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 public class UserEvent extends IRCEvent{
     private final String login;
     private final String real_name;
@@ -19,5 +21,10 @@ public class UserEvent extends IRCEvent{
 		// TODO Auto-generated method stub
 		return null;
 	}
-    
+
+    @Override
+    public void visit(Channel channel) {
+
+    }
+
 }

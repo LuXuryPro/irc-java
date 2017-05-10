@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 public class TopicEvent extends IRCEvent {
 	private String topic;
 
@@ -18,6 +20,12 @@ public class TopicEvent extends IRCEvent {
 	public String generateDisplayString() {
 		return null;
 	}
+
+	@Override
+	public void visit(Channel channel) {
+		channel.setTopic(this.getTopic());
+	}
+
 	public String getTopic() {
 		return topic;
 	}

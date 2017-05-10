@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -62,4 +64,6 @@ public abstract class IRCEvent {
 	public String getChannel() {
 		return this.channel;
 	}
+
+    public abstract void visit(Channel channel);
 }

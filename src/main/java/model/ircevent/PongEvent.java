@@ -5,6 +5,8 @@
  */
 package model.ircevent;
 
+import model.Channel;
+
 public class PongEvent extends IRCEvent{
     private final String id;
     public PongEvent(String id) {
@@ -22,5 +24,10 @@ public class PongEvent extends IRCEvent{
 		// TODO Auto-generated method stub
 		return null;
 	}
-    
+
+    @Override
+    public void visit(Channel channel) {
+
+    }
+
 }

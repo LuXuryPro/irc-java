@@ -13,7 +13,7 @@ import javax.swing.event.TreeSelectionListener;
 
 import view.View;
 import model.Model;
-import model.User;
+import model.User.User;
 import model.ircevent.IRCActionEvent;
 import model.ircevent.ModeEvent;
 import model.ircevent.QuitEvent;

@@ -1,5 +1,7 @@
 package model.ircevent;
 
+import model.Channel;
+
 public class PingEvent extends IRCEvent {
 	private final String id;
 
@@ -20,6 +22,11 @@ public class PingEvent extends IRCEvent {
 	@Override
 	public String generateDisplayString() {
 		return null;
+	}
+
+	@Override
+	public void visit(Channel channel) {
+
 	}
 
 }

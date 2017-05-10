@@ -1,7 +1,17 @@
 package model.User;
 
-/**
- * Created by radek on 10.05.17.
- */
-public class NormalUser {
+public class NormalUser extends User {
+    public NormalUser(String name) {
+        super(name);
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof NormalUser) && super.equals(o);
+    }
 }
