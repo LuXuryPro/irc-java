@@ -22,7 +22,6 @@ import model.ircevent.PrivmsgEvent;
 import model.ircevent.UserEvent;
 
 /**
- *
  * @author radek
  */
 public class Server {
@@ -43,10 +42,8 @@ public class Server {
     private boolean disconnecting = false;
 
     /**
-     * @param nick
-     *            nick to set on server
-     * @param host
-     *            host name
+     * @param nick nick to set on server
+     * @param host host name
      * @throws UnknownHostException
      * @throws IOException
      */
@@ -55,12 +52,9 @@ public class Server {
     }
 
     /**
-     * @param nick
-     *            nick to set on server
-     * @param host
-     *            host name
-     * @param port
-     *            port of host
+     * @param nick nick to set on server
+     * @param host host name
+     * @param port port of host
      * @throws UnknownHostException
      * @throws IOException
      */
@@ -111,41 +105,50 @@ public class Server {
         }
     }
 
+    private void networkCommunication(final String line) {
+        if (line.startsWith("PING ")) {
+            IRCEvent e = new PingEvent(line.substring(5));
+            this.sendEvent(new PongEvent(((PingEvent) e).getId()));
+        }
+    }
+
     private void in() {
         String line;
         while (true) {
             try {
                 if ((line = this.reader.readLine()) != null) {
-                    if (line.startsWith("PING ")) {
-                        IRCEvent e = new PingEvent(line.substring(5));
-                        this.sendEvent(new PongEvent(((PingEvent) e).getId()));
-                    } else if (line.startsWith(":")) {
-                        if (line.contains("004")) {
-                            this.setRegistred(true);
-                            this.out_thread.interrupt();
-                        }
-                        IRCEvent e = Parser.parse(line);
-                        if (e != null) {
-                            if (e instanceof PrivmsgEvent) {
-                                if (((PrivmsgEvent) e).getMsg().contains(this.nick))
-                                    ((PrivmsgEvent) e).setImortant(true);
-                            } else if (e instanceof NickEvent) {
-                                for (Channel c : this.channels) {
-                                    if (c.getUserByName(((NickEvent) e).getOldNick()) != null) {
-                                        c.addEvent(e);
-                                    }
-                                }
-                                if (((NickEvent) e).getOldNick().equals(this.nick))
-                                    this.nick = ((NickEvent) e).getNewNick();
-                                continue;
-                            }
-                            this.getChannel(e.getChannel()).addEvent(e);
-                        }
-                    }
+                    this.networkCommunication(line);
+                    this.ircCommunication(line);
                 }
             } catch (IOException ex) {
                 if (this.disconnecting)
                     break;
+            }
+        }
+    }
+
+    private void ircCommunication(String line) {
+        if (line.startsWith(":")) {
+            if (line.contains("004")) {
+                this.setRegistred(true);
+                this.out_thread.interrupt();
+            }
+            IRCEvent e = Parser.parse(line);
+            if (e != null) {
+                if (e instanceof PrivmsgEvent) {
+                    if (((PrivmsgEvent) e).getMsg().contains(this.nick))
+                        ((PrivmsgEvent) e).setImortant(true);
+                } else if (e instanceof NickEvent) {
+                    for (Channel c : this.channels) {
+                        if (c.getUserByName(((NickEvent) e).getOldNick()) != null) {
+                            c.addEvent(e);
+                        }
+                    }
+                    if (((NickEvent) e).getOldNick().equals(this.nick))
+                        this.nick = ((NickEvent) e).getNewNick();
+                    return;
+                }
+                this.getChannel(e.getChannel()).addEvent(e);
             }
         }
     }
@@ -191,8 +194,7 @@ public class Server {
     /**
      * Set if user is registered
      *
-     * @param registred
-     *            new boolean registered value
+     * @param registred new boolean registered value
      */
     public synchronized void setRegistred(boolean registred) {
         this.registred = registred;
@@ -201,12 +203,11 @@ public class Server {
     /**
      * Send event to server
      *
-     * @param m
-     *            Event to send
+     * @param m Event to send
      */
     public void sendEvent(IRCEvent m) {
         if (!this.isRegistred()
-            && (m instanceof NickEvent || m instanceof UserEvent || m instanceof PongEvent)) {
+                && (m instanceof NickEvent || m instanceof UserEvent || m instanceof PongEvent)) {
             register_events.offer(m);
         } else {
             output_events.offer(m);
@@ -223,8 +224,7 @@ public class Server {
     /**
      * Set channel to be current
      *
-     * @param name
-     *            name of channel to set
+     * @param name name of channel to set
      */
     public synchronized void setCurrentChannel(String name) {
         if (name == null) {
@@ -243,8 +243,7 @@ public class Server {
     /**
      * Get channel by name
      *
-     * @param name
-     *            name of channel
+     * @param name name of channel
      * @return Channel of given name
      */
     public synchronized Channel getChannel(String name) {
@@ -270,8 +269,7 @@ public class Server {
     /**
      * Create new channel
      *
-     * @param name
-     *            name of new channel
+     * @param name name of new channel
      */
     public void addChannel(String name) {
         this.channels.add(new Channel(name));
@@ -280,8 +278,7 @@ public class Server {
     /**
      * Remove channel from server by name
      *
-     * @param name
-     *            name of channel to remove
+     * @param name name of channel to remove
      */
     public void removeChannel(String name) {
         if (name == null) {
