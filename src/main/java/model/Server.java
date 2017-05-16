@@ -30,7 +30,6 @@ public class Server {
     private ArrayList<Channel> channels;
     private String nick;
     private String host;
-    private int port;
     private Socket socket;
     private Thread out_thread;
     private Thread in_thread;
@@ -62,7 +61,7 @@ public class Server {
         super();
         this.nick = nick;
         this.host = host;
-        this.port = port;
+        int port1 = port;
         this.socket = new Socket(host, port);
         this.writer = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
         this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
@@ -139,11 +138,7 @@ public class Server {
                     if (((PrivmsgEvent) e).getMsg().contains(this.nick))
                         ((PrivmsgEvent) e).setImortant(true);
                 } else if (e instanceof NickEvent) {
-                    for (Channel c : this.channels) {
-                        if (c.getUserByName(((NickEvent) e).getOldNick()) != null) {
-                            c.addEvent(e);
-                        }
-                    }
+                    channels.forEach(channel -> channel.addEvent(e));
                     if (((NickEvent) e).getOldNick().equals(this.nick))
                         this.nick = ((NickEvent) e).getNewNick();
                     return;

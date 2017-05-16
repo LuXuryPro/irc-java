@@ -1,23 +1,13 @@
 package model;
 
+import model.User.User;
+import model.ircevent.IRCEvent;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import model.User.AdminUser;
-import model.User.NormalUser;
-import model.User.User;
-import model.User.VoiceUser;
-import model.ircevent.IRCEvent;
-import model.ircevent.JoinEvent;
-import model.ircevent.ModeEvent;
-import model.ircevent.NamesEvent;
-import model.ircevent.NickEvent;
-import model.ircevent.PartEvent;
-import model.ircevent.TopicChangeEvent;
-import model.ircevent.TopicEvent;
 
 public class Channel {
     private String name;
@@ -32,7 +22,7 @@ public class Channel {
      */
     public Channel(String name) {
         this.name = name;
-        this.topic = new String("");
+        this.topic = "";
         this.users = new ArrayList<User>();
         this.events = new ArrayList<IRCEvent>();
     }
@@ -40,11 +30,11 @@ public class Channel {
     /**
      * Add new event to channel
      *
-     * @param e Event to add
+     * @param ircEvent Event to add
      */
-    public synchronized void addEvent(IRCEvent e) {
-        this.events.add(e);
-        e.visit(this);
+    public synchronized void addEvent(IRCEvent ircEvent) {
+        this.events.add(ircEvent);
+        ircEvent.visit(this);
         this.notifyAll();
     }
 
@@ -55,9 +45,9 @@ public class Channel {
      * @return User object on channel
      */
     public User getUserByName(String name) {
-        for (User u : users) {
-            if (u.getName().equals(name))
-                return u;
+        for (User user : users) {
+            if (user.getName().equals(name))
+                return user;
         }
         return null;
     }
@@ -68,13 +58,13 @@ public class Channel {
      * @param name name of user to remove
      */
     public void removeUser(String name) {
-        int i = 0;
-        for (User u : this.users) {
-            if (u.getName().equals(name)) {
-                this.users.remove(i);
+        int index = 0;
+        for (User user : this.users) {
+            if (user.getName().equals(name)) {
+                this.users.remove(index);
                 return;
             }
-            i++;
+            index++;
         }
     }
 
@@ -90,8 +80,8 @@ public class Channel {
      */
     public synchronized ArrayList<IRCEvent> getEvents() {
         @SuppressWarnings("unchecked")
-        ArrayList<IRCEvent> e = (ArrayList<IRCEvent>) this.events.clone();
-        return e;
+        ArrayList<IRCEvent> ircEvents = (ArrayList<IRCEvent>) this.events.clone();
+        return ircEvents;
     }
 
     /**
@@ -103,8 +93,8 @@ public class Channel {
     public synchronized ArrayList<IRCEvent> waitForEvents() throws InterruptedException {
         wait();
         @SuppressWarnings("unchecked")
-        ArrayList<IRCEvent> e = (ArrayList<IRCEvent>) this.events.clone();
-        return e;
+        ArrayList<IRCEvent> ircEvents = (ArrayList<IRCEvent>) this.events.clone();
+        return ircEvents;
     }
 
     /**
@@ -128,12 +118,13 @@ public class Channel {
      */
     public synchronized void saveToFile(String file_name) {
         try {
-            File f = new File(file_name);
-            BufferedWriter w = new BufferedWriter(new FileWriter(f));
-            w.write("<body bgcolor = '#1C1C1C'><font color = 'white' face = 'monospace'>");
-            for (IRCEvent e : this.events) w.write(e.generateDisplayString() + "<br>");
-            w.write("</font></body>");
-            w.close();
+            File file = new File(file_name);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write("<body bgcolor = '#1C1C1C'><font color = 'white' face = 'monospace'>");
+            for (IRCEvent ircEvent : this.events)
+                writer.write(ircEvent.generateDisplayString() + "<br>");
+            writer.write("</font></body>");
+            writer.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

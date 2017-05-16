@@ -25,9 +25,8 @@ public class ConnectionList extends JPanel {
 	private final JTree tree;
 	private final DefaultMutableTreeNode rootNode;
 	private final DefaultTreeModel treeModel;
-	private final ScrollPane sp;
 
-	public ConnectionList() {
+    public ConnectionList() {
 		this.setPreferredSize(new Dimension(300,100));
 		this.setLayout(new BorderLayout());
 		rootNode = new DefaultMutableTreeNode("Root Node");
@@ -35,7 +34,7 @@ public class ConnectionList extends JPanel {
 		tree = new JTree(treeModel);
 		this.tree.setBackground(new Color(0x1C, 0x1C, 0x1C));
 		this.tree.setForeground(new Color(0xFF, 0xFF, 0xFF));
-		sp = new ScrollPane();
+        ScrollPane sp = new ScrollPane();
 		tree.setEditable(false);
 		tree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);

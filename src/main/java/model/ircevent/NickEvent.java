@@ -35,7 +35,8 @@ public class NickEvent extends IRCEvent {
 
     @Override
     public void visit(Channel channel) {
-        channel.getUserByName(this.getOldNick()).setName(this.getNewNick());
+        if (channel.getUserByName(this.getOldNick()) != null)
+            channel.getUserByName(this.getOldNick()).setName(this.getNewNick());
     }
 
     public String getNewNick() {

@@ -26,8 +26,7 @@ public class View {
 	private final JFrame frame;
 	private final ConnectionList connectionList;
 	private final UsersList usersList;
-	private final JPanel channel_panel;
-	private final JTextField entry;
+    private final JTextField entry;
 	private final JLabel topic;
 	private final JLabel users_count;
 	private final JLabel nick;
@@ -112,10 +111,10 @@ public class View {
 		this.topic.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		p.add(this.topic, BorderLayout.NORTH);
 		p.add(this.text_scroll, BorderLayout.CENTER);
-		this.channel_panel = new JPanel();
-		this.channel_panel.setLayout(new BorderLayout(5,5));
-		this.channel_panel.add(p3 ,BorderLayout.SOUTH);
-		this.channel_panel.add(p, BorderLayout.CENTER);
+        JPanel channel_panel = new JPanel();
+		channel_panel.setLayout(new BorderLayout(5,5));
+		channel_panel.add(p3 ,BorderLayout.SOUTH);
+		channel_panel.add(p, BorderLayout.CENTER);
 		JPanel p2 = new JPanel();
 		p2.setLayout(new BorderLayout(5,5));
 		this.users_count = new JLabel("",SwingConstants.CENTER);
@@ -125,8 +124,8 @@ public class View {
 		this.users_count.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		p2.add(this.users_count, BorderLayout.NORTH);
 		p2.add(this.usersList,BorderLayout.CENTER);
-		this.channel_panel.add(p2, BorderLayout.EAST);
-		this.frame.add(this.channel_panel, BorderLayout.CENTER);
+		channel_panel.add(p2, BorderLayout.EAST);
+		this.frame.add(channel_panel, BorderLayout.CENTER);
 		frame.setVisible(true);
 	}
 	

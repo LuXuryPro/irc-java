@@ -13,18 +13,17 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 public class UsersList extends ScrollPane {
-	private final JList<String> list;
-	private final DefaultListModel<String> list_model;
+    private final DefaultListModel<String> list_model;
 
 	public UsersList() {
 		super();
 		this.setPreferredSize(new Dimension(200,100));
-		this.list = new JList<String>();
-		this.list.setBackground(new Color(0x1C, 0x1C, 0x1C));
-		this.list.setForeground(new Color(0xFF, 0xFF, 0xFF));
+        JList<String> list = new JList<String>();
+		list.setBackground(new Color(0x1C, 0x1C, 0x1C));
+		list.setForeground(new Color(0xFF, 0xFF, 0xFF));
 		this.list_model = new DefaultListModel<String>();
-		this.list.setModel(list_model);
-		this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setModel(list_model);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.add(list);
 	}
 
